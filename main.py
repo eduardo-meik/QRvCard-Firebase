@@ -46,7 +46,7 @@ def main():
         st.title("QR vCard")
         display_qr()
     elif selected == "Salir":
-        display_signout()
+        signout()
    
 if __name__ == "__main__":
     main()
