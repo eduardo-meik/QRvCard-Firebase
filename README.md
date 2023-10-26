@@ -1,4 +1,5 @@
 #QRvCard-Firebase App
+
 This Streamlit application allows users to create and manage virtual business cards (vCards) in the form of QR codes. Users can also view a list of QR codes they've generated. Additionally, it provides user authentication features with Firebase.
 
 Table of Contents
@@ -13,13 +14,14 @@ User Authentication: Users can sign up and log into the application using their 
 QR vCard Creation: Generate a QR code for a vCard with user details.
 QR List: View a list of generated QR codes.
 Intuitive UI: User-friendly interface with clear navigation and error messages.
+
 Installation
 Clone the repository
 
 bash
 Copy code
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-cd YOUR_REPO_NAME
+git clone https://github.com/eduardo-meik/QRvCard-Firebase.git
+cd QRvCard-Firebase
 Set up a virtual environment (Optional, but recommended)
 
 bash
