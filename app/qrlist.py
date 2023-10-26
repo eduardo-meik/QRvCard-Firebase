@@ -20,25 +20,11 @@ def display_list():
         st.write(f"Website: {vcard_data.get('URL', 'N/A')}")
         st.write(f"LinkedIn: {vcard_data.get('X-SOCIALPROFILE', 'N/A')}")
 
-        qr_url = vcard_data.get("QR_URL", "")
-        st.write(f"Raw QR_URL: {qr_url}")  # Display the raw QR_URL
+        qr_image_url = vcard_data.get("QR_URL", "")
         
-        # Check if the QR_URL is in the expected format
-        if "gs://pullmai-e0bb0.appspot.com/" in qr_url:
-            # Create a button to fetch and display the QR code image
-            if st.button("Show QR Code"):
-                # Get the QR image's path from Firestore data (the part after the bucket name)
-                path_in_bucket = qr_url.split("gs://pullmai-e0bb0.appspot.com/")[1]
-                bucket = storage.bucket()
-                blob = bucket.blob(path_in_bucket)
-
-                # Generate a signed URL for the blob, valid for 5 minutes
-                qr_image_url = blob.generate_signed_url(timedelta(minutes=5))
-                
-                # Display the image fullscreen
-                st.image(qr_image_url, caption="QR Code", width=st.get_option('deprecation.showPyplotGlobalUse'))
-        else:
-            st.write("Invalid QR URL format")
+        # Create a button to display the QR code image in fullscreen
+        if st.button("Show QR Code"):
+            st.image(qr_image_url, caption="QR Code", use_container_width=True)
 
         st.write("---")  # Separator
     else:
