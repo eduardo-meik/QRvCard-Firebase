@@ -1,4 +1,4 @@
-# QR vCard Streamlit App
+# QR vCard Streamlit Firebase App
 
 This Streamlit application allows users to create and manage virtual business cards (vCards) in the form of QR codes. Users can also view a list of QR codes they've generated. Additionally, it provides user authentication features with Firebase.
 
