@@ -4,9 +4,6 @@ import json
 from streamlit_option_menu import option_menu
 import firebase_admin
 from firebase_admin import credentials
-from app.embeddings import display_embeddings
-from app.chat import display_chat
-from app.store import display_store
 from app.qrvcard import display_qr
 from app.qrlist import display_list
 from app.account import account  # Importing the account module
