@@ -21,6 +21,7 @@ def display_list():
         st.write(f"LinkedIn: {vcard_data.get('X-SOCIALPROFILE', 'N/A')}")
 
         qr_url = vcard_data.get("QR_URL", "")
+        st.write(f"Raw QR_URL: {qr_url}")  # Display the raw QR_URL
         
         # Check if the QR_URL is in the expected format
         if "gs://pullmai-e0bb0.appspot.com/" in qr_url:
@@ -42,12 +43,3 @@ def display_list():
         st.write("---")  # Separator
     else:
         st.write("No vCard found for this user.")
-
-
-
-
-
-
-
-
-
