@@ -32,11 +32,17 @@ def account():
         st.session_state['signout'] = False    
 
     if not st.session_state["signedout"]: 
-        choice = st.radio('Choose an action', ('Login', 'Sign up'))
-        email = st.text_input('Email Address')
-        password = st.text_input('Password', type='password')
+        login_tab, signup_tab = st.tabs(['Login', 'Sign up'])
 
-        if choice == 'Sign up':
+        with login_tab:
+            email = st.text_input('Email Address')
+            password = st.text_input('Password', type='password')
+            if st.button('Login'):
+                f()
+
+        with signup_tab:
+            email = st.text_input('Email Address')
+            password = st.text_input('Password', type='password')
             confirm_password = st.text_input('Confirm Password', type='password')
             if st.button('Create my account'):
                 if password == confirm_password:
@@ -49,13 +55,12 @@ def account():
                         st.error(f"Error creating user: {e}")
                 else:
                     st.error("Passwords don't match!")
-        else:
-            st.button('Login', on_click=f)
 
     if st.session_state.signout:
         st.text('Name ' + st.session_state.username)
         st.text('Email id: ' + st.session_state.useremail)
         st.button('Sign out', on_click=t)
+
 
 
 
