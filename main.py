@@ -33,8 +33,8 @@ def main():
     # Navigation bar Menu
     selected = option_menu(
         menu_title=None,  # menu title
-        options=['Inicio', 'QR vCard', 'QR vCards List'],  # menu options
-        icons=['house', 'layers', 'archive'],  # menu icons
+        options=['Inicio', 'QR vCard'],  # menu options
+        icons=['house', 'layers'],  # menu icons
         menu_icon="cast",  # menu icon
         default_index=0,  # default selected index
         orientation="horizontal"  # sidebar or navigation bar
@@ -42,12 +42,10 @@ def main():
 
     if selected == "Inicio":
         st.title("Inicio")
+        display_list()
     elif selected == "QR vCard":
         st.title("QR vCard")
         display_qr()
-    elif selected == "QR vCards List":
-        st.title("QR vCards List")
-        display_list()
-
+   
 if __name__ == "__main__":
     main()
