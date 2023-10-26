@@ -29,12 +29,11 @@ def main():
         account()  # This calls the account function which handles authentication
         return  # Ensures that the rest of the application doesn't run until the user is authenticated
     
-    # Below this point, your main application code goes
     # Navigation bar Menu
     selected = option_menu(
         menu_title=None,  # menu title
-        options=['Inicio', 'QR vCard'],  # menu options
-        icons=['house', 'layers'],  # menu icons
+        options=['Inicio', 'QR vCard', 'Salir'],  # menu options
+        icons=['house', 'layers', 'box-arrow-in-right'],  # menu icons
         menu_icon="cast",  # menu icon
         default_index=0,  # default selected index
         orientation="horizontal"  # sidebar or navigation bar
@@ -46,6 +45,8 @@ def main():
     elif selected == "QR vCard":
         st.title("QR vCard")
         display_qr()
+    elif selected == "Salir":
+        display_signout()
    
 if __name__ == "__main__":
     main()
