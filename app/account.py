@@ -44,8 +44,8 @@ def account():
             email = st.text_input('Email Address', key='signup_email')
             password = st.text_input('Password', type='password', key='signup_password')
             confirm_password = st.text_input('Confirm Password', type='password', key='signup_confirm_password')
-                    if st.button('Create my account'):
-                        if password == confirm_password:
+            if st.button('Create my account'):
+                if password == confirm_password:
                     try:
                         user = auth.create_user(email=email, password=password)
                         st.success('Account created successfully!')
