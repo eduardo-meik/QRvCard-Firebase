@@ -3,6 +3,12 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, auth, storage
 
+def signout():
+    st.session_state.signout = False
+    st.session_state.signedout = False   
+    st.session_state.username = ''
+    st.session_state.login_successful = False  # Reset the login_successful flag
+    
 def account():
     st.title('Tarjeta de presentación en QR')
 
