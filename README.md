@@ -19,7 +19,7 @@ Intuitive UI: User-friendly interface with clear navigation and error messages.
 ## Installation
 Clone the repository
 
-bash
+`inline code` bash
 Copy code
 git clone https://github.com/eduardo-meik/QRvCard-Firebase.git
 cd QRvCard-Firebase
