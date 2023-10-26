@@ -47,7 +47,7 @@ def main():
         display_qr()
     elif selected == "QR vCards List":
         st.title("QR vCards List")
-        display_store()
+        display_list()
 
 if __name__ == "__main__":
     main()
