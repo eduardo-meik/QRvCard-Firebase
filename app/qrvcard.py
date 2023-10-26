@@ -14,14 +14,15 @@ def generate_qr(vcard_data):
 
 def upload_to_firebase(img_bytes, filename):
     try:
-        bucket = storage.bucket()
+        bucket = storage.bucket('pullmai-e0bb0.appspot.com')  # Specifying bucket directly
         blob = bucket.blob(filename)
-        blob.upload_from_string(img_bytes, content_type="image/png") # Changed method to upload_from_string
+        blob.upload_from_string(img_bytes, content_type="image/png")
         blob.make_public()
         return blob.public_url
     except Exception as e:
         st.error(f"Error uploading to Firebase: {e}")
         return None
+
 
 
 def display_qr():
