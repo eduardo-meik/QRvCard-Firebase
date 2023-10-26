@@ -11,15 +11,18 @@ def account():
     if 'useremail' not in st.session_state:
         st.session_state.useremail = ''
 
-    def f(): 
+    def f():
         try:
             user = auth.get_user_by_email(email)
             st.session_state.username = user.uid
             st.session_state.useremail = user.email
             st.session_state.signedout = True
-            st.session_state.signout = True    
-        except: 
+            st.session_state.signout = True
+            st.session_state.login_successful = True  # Set a new session state variable
+        except:
             st.warning('Login Failed')
+            st.session_state.login_successful = False
+
 
     def t():
         st.session_state.signout = False
