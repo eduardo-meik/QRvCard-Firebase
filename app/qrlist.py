@@ -1,31 +1,39 @@
 import streamlit as st
-from firebase_admin import firestore
+from firebase_admin import firestore, storage
 
 def display_list():
-   
+    st.title("QR List")
+
     # Fetch the vCards for the authenticated user from Firestore
     db = firestore.client()
-    vcard = db.collection('vcards').document(st.session_state.username).get().to_dict()
+    vcard_ref = db.collection('vcards').document(st.session_state.username).get()
+    vcards = vcard_ref.to_dict()
 
-    if vcard:
-        # Display the vCard details
-        st.write(f"Name: {vcard.get('FN', 'N/A')}")
-        st.write(f"Organization: {vcard.get('ORG', 'N/A')}")
-        st.write(f"Role: {vcard.get('ROLE', 'N/A')}")
-        st.write(f"Phone (Cell): {vcard.get('TEL;TYPE=CELL', 'N/A')}")
-        st.write(f"Phone (Work): {vcard.get('TEL;TYPE=WORK', 'N/A')}")
-        st.write(f"Email: {vcard.get('EMAIL;TYPE=WORK', 'N/A')}")
-        st.write(f"Website: {vcard.get('URL', 'N/A')}")
-        st.write(f"LinkedIn: {vcard.get('X-SOCIALPROFILE', 'N/A')}")
-        
-        # Display the QR code image (ensure that "QR_URL" always exists in the vcard)
-        qr_url = vcard.get("QR_URL")
-        if qr_url:
-            st.image(qr_url, caption="QR Code", use_column_width=True)
-            
-        st.write("---")  # Separator
+    if vcards:
+        for full_name, data in vcards.items():
+            # Display the vCard details
+            st.write(f"Name: {full_name}")
+            st.write(f"Organization: {data.get('ORG', 'N/A')}")
+            st.write(f"Role: {data.get('ROLE', 'N/A')}")
+            st.write(f"Phone (Cell): {data.get('TEL;TYPE=CELL', 'N/A')}")
+            st.write(f"Phone (Work): {data.get('TEL;TYPE=WORK', 'N/A')}")
+            st.write(f"Email: {data.get('EMAIL;TYPE=WORK', 'N/A')}")
+            st.write(f"Website: {data.get('URL', 'N/A')}")
+            st.write(f"LinkedIn: {data.get('X-SOCIALPROFILE', 'N/A')}")
+
+            # Fetch and display the QR code image
+            qr_url = data.get("QR_URL")
+            if qr_url:
+                # Create a Firebase Storage client
+                bucket = storage.bucket()
+                blob = bucket.blob(qr_url)  # Adjust this if the `qr_url` is not the exact path in the storage bucket
+                qr_image_url = blob.generate_signed_url(timedelta(seconds=300), method='GET')  # This URL will be valid for 5 minutes
+                st.image(qr_image_url, caption="QR Code", use_column_width=True)
+                
+            st.write("---")  # Separator
     else:
         st.write("No vCards found for this user.")
+
 
 
 
