@@ -1,5 +1,6 @@
 import streamlit as st
-from firebase_admin import firestore
+from firebase_admin import firestore, storage
+from datetime import timedelta
 
 def display_list():
     st.title("QR List")
@@ -19,14 +20,23 @@ def display_list():
         st.write(f"Website: {vcard_data.get('URL', 'N/A')}")
         st.write(f"LinkedIn: {vcard_data.get('X-SOCIALPROFILE', 'N/A')}")
 
-        # Display the QR code image
-        qr_url = vcard_data.get("QR_URL")
-        if qr_url:
-            st.image(qr_url, caption="QR Code", use_column_width=True)
+        # Create a button to fetch and display the QR code image
+        if st.button("Show QR Code"):
+            # Get the QR image's path from Firestore data (the part after the bucket name)
+            path_in_bucket = vcard_data.get("QR_URL", "").split("gs://pullmai-e0bb0.appspot.com/")[1]
+            bucket = storage.bucket()
+            blob = bucket.blob(path_in_bucket)
+
+            # Generate a signed URL for the blob, valid for 5 minutes
+            qr_image_url = blob.generate_signed_url(timedelta(minutes=5))
+            
+            # Display the image fullscreen
+            st.image(qr_image_url, caption="QR Code", width=st.get_option('deprecation.showPyplotGlobalUse'))
 
         st.write("---")  # Separator
     else:
         st.write("No vCard found for this user.")
+
 
 
 
