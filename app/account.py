@@ -35,17 +35,17 @@ def account():
         login_tab, signup_tab = st.tabs(['Login', 'Sign up'])
 
         with login_tab:
-            email = st.text_input('Email Address')
-            password = st.text_input('Password', type='password')
+            email = st.text_input('Email Address', key='login_email')
+            password = st.text_input('Password', type='password', key='login_password')
             if st.button('Login'):
                 f()
 
         with signup_tab:
-            email = st.text_input('Email Address')
-            password = st.text_input('Password', type='password')
-            confirm_password = st.text_input('Confirm Password', type='password')
-            if st.button('Create my account'):
-                if password == confirm_password:
+            email = st.text_input('Email Address', key='signup_email')
+            password = st.text_input('Password', type='password', key='signup_password')
+            confirm_password = st.text_input('Confirm Password', type='password', key='signup_confirm_password')
+                    if st.button('Create my account'):
+                        if password == confirm_password:
                     try:
                         user = auth.create_user(email=email, password=password)
                         st.success('Account created successfully!')
