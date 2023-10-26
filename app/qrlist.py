@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 
 def display_list():
-    st.title("QR List")
+    st.title("QR vCard")
 
     # Fetch the vCard for the authenticated user from Firestore
     db = firestore.client()
