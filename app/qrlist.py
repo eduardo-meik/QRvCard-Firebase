@@ -13,15 +13,20 @@ def display_list():
         for full_name, data in vcards.items():
             # Display the vCard details
             st.write(f"Name: {full_name}")
-            st.write(f"Organization: {data['ORG']}")
-            st.write(f"Role: {data['ROLE']}")
-            st.write(f"Phone (Cell): {data['TEL;TYPE=CELL']}")
-            st.write(f"Phone (Work): {data['TEL;TYPE=WORK']}")
-            st.write(f"Email: {data['EMAIL;TYPE=WORK']}")
-            st.write(f"Website: {data['URL']}")
-            st.write(f"LinkedIn: {data['X-SOCIALPROFILE']}")
-            # Display the QR code image
-            st.image(data["QR_URL"], caption="QR Code", use_column_width=True)
+            st.write(f"Organization: {data.get('ORG', 'N/A')}")
+            st.write(f"Role: {data.get('ROLE', 'N/A')}")
+            st.write(f"Phone (Cell): {data.get('TEL;TYPE=CELL', 'N/A')}")
+            st.write(f"Phone (Work): {data.get('TEL;TYPE=WORK', 'N/A')}")
+            st.write(f"Email: {data.get('EMAIL;TYPE=WORK', 'N/A')}")
+            st.write(f"Website: {data.get('URL', 'N/A')}")
+            st.write(f"LinkedIn: {data.get('X-SOCIALPROFILE', 'N/A')}")
+            
+            # Display the QR code image (ensure that "QR_URL" always exists in the data)
+            qr_url = data.get("QR_URL")
+            if qr_url:
+                st.image(qr_url, caption="QR Code", use_column_width=True)
+            
             st.write("---")  # Separator
     else:
         st.write("No vCards found for this user.")
+
