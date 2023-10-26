@@ -9,6 +9,9 @@ def display_list():
     vcard_ref = db.collection('vcards').document(st.session_state.username).get()
     vcards = vcard_ref.to_dict()
 
+    # Print the fetched data to console
+    st.write("Fetched Data:", vcards)
+
     if vcards and isinstance(vcards, dict):
         # Create a list to store table data
         table_data = []
