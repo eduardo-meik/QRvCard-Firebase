@@ -9,30 +9,33 @@ def display_list():
     vcard_ref = db.collection('vcards').document(st.session_state.username).get()
     vcards = vcard_ref.to_dict()
 
-    # Diagnostic to check the structure of the fetched data
-    st.write(f"vcards content: {vcards}")
-
     if vcards and isinstance(vcards, dict):
+        # Create a list to store table data
+        table_data = []
+
         for full_name, data in vcards.items():
             if isinstance(data, dict):
-                # Display the vCard details
-                st.write(f"Name: {full_name}")
-                st.write(f"Organization: {data.get('ORG', 'N/A')}")
-                st.write(f"Role: {data.get('ROLE', 'N/A')}")
-                st.write(f"Phone (Cell): {data.get('TEL;TYPE=CELL', 'N/A')}")
-                st.write(f"Phone (Work): {data.get('TEL;TYPE=WORK', 'N/A')}")
-                st.write(f"Email: {data.get('EMAIL;TYPE=WORK', 'N/A')}")
-                st.write(f"Website: {data.get('URL', 'N/A')}")
-                st.write(f"LinkedIn: {data.get('X-SOCIALPROFILE', 'N/A')}")
+                row_data = {
+                    "Name": full_name,
+                    "Organization": data.get('ORG', 'N/A'),
+                    "Role": data.get('ROLE', 'N/A'),
+                    "Phone (Cell)": data.get('TEL;TYPE=CELL', 'N/A'),
+                    "Phone (Work)": data.get('TEL;TYPE=WORK', 'N/A'),
+                    "Email": data.get('EMAIL;TYPE=WORK', 'N/A'),
+                    "Website": data.get('URL', 'N/A'),
+                    "LinkedIn": data.get('X-SOCIALPROFILE', 'N/A')
+                }
+                table_data.append(row_data)
 
-                # Display the QR code image (ensure that "QR_URL" always exists in the data)
-                qr_url = data.get("QR_URL")
-                if qr_url:
-                    st.image(qr_url, caption="QR Code", use_column_width=True)
-
+                # Display the QR code image with an option to expand
+                st.image(data.get("QR_URL"), caption=f"QR Code for {full_name}", use_column_width=True)
+                if st.checkbox(f"Expand QR for {full_name}"):
+                    st.image(data.get("QR_URL"), use_column_width='auto')
                 st.write("---")  # Separator
-            else:
-                st.write(f"Unexpected data format for {full_name}: {data}")
+
+        # Display table
+        st.table(table_data)
+
     else:
         st.write("No vCards found or unexpected data format.")
 
