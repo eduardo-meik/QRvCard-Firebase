@@ -3,6 +3,7 @@ import streamlit as st
 import qrcode
 import io
 from PIL import Image
+from firebase_admin import storage
 
 def generate_qr(vcard_data):
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -10,6 +11,13 @@ def generate_qr(vcard_data):
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     return img
+
+def upload_to_firebase(img_bytes, filename):
+    bucket = storage.bucket()
+    blob = bucket.blob(filename)
+    blob.upload_from_file(io.BytesIO(img_bytes), content_type="image/png")
+    blob.make_public()
+    return blob.public_url
 
 def display_qr():
     st.title('vCard QR Code Generator')
@@ -51,10 +59,14 @@ def display_qr():
         img_pil.save(buffered, format="PNG")
         img_bytes = buffered.getvalue()
 
+        filename = f"{full_name}.png"
+        file_url = upload_to_firebase(img_bytes, filename)
+
         st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
         st.download_button(
             label="Download QR Code",
             data=img_bytes,
-            file_name=f"{full_name}.png",
+            file_name=filename,
             mime="image/png"
         )
+        st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
