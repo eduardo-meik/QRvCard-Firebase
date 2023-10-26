@@ -2,8 +2,7 @@ import streamlit as st
 from firebase_admin import firestore
 
 def display_list():
-    st.title("Store QR")
-
+   
     # Fetch the vCards for the authenticated user from Firestore
     db = firestore.client()
     vcard = db.collection('vcards').document(st.session_state.username).get().to_dict()
