@@ -1,6 +1,6 @@
-import streamlit as st
-from firebase_admin import firestore, storage
-from datetime import timedelta
+import requests
+from PIL import Image
+from io import BytesIO
 
 def display_list():
     st.title("QR List")
@@ -24,8 +24,11 @@ def display_list():
         
         # Create a button to display the QR code image in fullscreen
         if st.button("Show QR Code"):
-            st.image(qr_image_url, caption="QR Code", use_container_width=True)
+            response = requests.get(qr_image_url)
+            img = Image.open(BytesIO(response.content))
+            st.image(img, caption="QR Code", use_container_width=True)
 
         st.write("---")  # Separator
     else:
         st.write("No vCard found for this user.")
+
