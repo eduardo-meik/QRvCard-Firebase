@@ -1,13 +1,13 @@
 #account.py
 import streamlit as st
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, storage
 
 # Encapsulated Firebase Initialization
 def initialize_firebase():
     if not firebase_admin._apps:
         cred = st.secrets("textkey")
-        firebase_admin.initialize_app(cred)
+        firebase_admin.initialize_app(cred, {'storageBucket': 'pullmai-e0bb0.appspot.com'})
 
 def account():
     st.title('Tarjeta de presentación en QR')
