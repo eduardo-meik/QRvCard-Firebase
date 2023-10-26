@@ -26,7 +26,7 @@ def main():
 
     st.set_page_config(
         page_title="QR vCard",
-        page_icon="U+26DA"
+        page_icon="⛚"
     )
     
     # Check for authentication
