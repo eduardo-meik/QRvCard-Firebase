@@ -28,6 +28,10 @@ def main():
     if not st.session_state.get("signedout", False):  # User not logged in
         account()  # This calls the account function which handles authentication
         return  # Ensures that the rest of the application doesn't run until the user is authenticated
+
+st.set_page_config(
+    page_title="Ex-stream-ly Cool App",
+    page_icon="🧊"
     
     # Navigation bar Menu
     selected = option_menu(
