@@ -3,6 +3,10 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, auth, storage
 
+st.set_page_config(
+    page_title="Ex-stream-ly Cool App",
+    page_icon="🧊"
+
 def signout():
     st.session_state.signout = False
     st.session_state.signedout = False   
