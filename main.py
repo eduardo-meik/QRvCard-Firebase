@@ -14,7 +14,8 @@ def initialize_firebase():
     creds = credentials.Certificate(key_dict)
 
     if not firebase_admin._apps:
-        firebase_admin.initialize_app(creds)
+        firebase_admin.initialize_app(creds, {'storageBucket': 'pullmai-e0bb0.appspot.com'})
+
 
 # Define main app function
 def main():
