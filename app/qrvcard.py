@@ -13,11 +13,16 @@ def generate_qr(vcard_data):
     return img
 
 def upload_to_firebase(img_bytes, filename):
-    bucket = storage.bucket()
-    blob = bucket.blob(filename)
-    blob.upload_from_file(io.BytesIO(img_bytes), content_type="image/png")
-    blob.make_public()
-    return blob.public_url
+    try:
+        bucket = storage.bucket()
+        blob = bucket.blob(filename)
+        blob.upload_from_string(img_bytes, content_type="image/png") # Changed method to upload_from_string
+        blob.make_public()
+        return blob.public_url
+    except Exception as e:
+        st.error(f"Error uploading to Firebase: {e}")
+        return None
+
 
 def display_qr():
     st.title('vCard QR Code Generator')
