@@ -39,8 +39,8 @@ def display_qr():
     linkedin = st.text_input("LinkedIn", "https://www.linkedin.com/in/juansoto/")
 
     vCard = {
-        "BEGIN": "VCARD",
-        "VERSION": "4.0",
+        #"BEGIN": "VCARD",
+        #"VERSION": "4.0",
         "KIND": "INDIVIDUAL",
         "FN": full_name,
         "N": f"{last_name};{first_name};;;",
