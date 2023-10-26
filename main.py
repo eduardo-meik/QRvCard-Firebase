@@ -8,7 +8,7 @@ from app.embeddings import display_embeddings
 from app.chat import display_chat
 from app.store import display_store
 from app.qrvcard import display_qr
-from app.extract import display_extract
+from app.qrlist import display_list
 from app.account import account  # Importing the account module
 
 # Initialize Firebase SDK
@@ -35,7 +35,7 @@ def main():
     # Navigation bar Menu
     selected = option_menu(
         menu_title=None,  # menu title
-        options=['Inicio', 'QR vCard', 'Store'],  # menu options
+        options=['Inicio', 'QR vCard', 'QR vCards List'],  # menu options
         icons=['house', 'layers', 'archive'],  # menu icons
         menu_icon="cast",  # menu icon
         default_index=0,  # default selected index
@@ -47,8 +47,8 @@ def main():
     elif selected == "QR vCard":
         st.title("QR vCard")
         display_qr()
-    elif selected == "Store":
-        st.title("Store")
+    elif selected == "QR vCards List":
+        st.title("QR vCards List")
         display_store()
 
 if __name__ == "__main__":
