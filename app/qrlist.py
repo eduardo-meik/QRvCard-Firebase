@@ -30,7 +30,7 @@ def display_list():
         if st.button("Show QR Code"):
             response = requests.get(qr_image_url)
             img = Image.open(BytesIO(response.content))
-            st.image(img, caption="QR Code", use_container_width=True)
+            st.image(img, caption="QR Code")
 
         st.write("---")  # Separator
     else:
