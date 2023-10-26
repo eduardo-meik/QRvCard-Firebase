@@ -10,7 +10,7 @@ def initialize_firebase():
         firebase_admin.initialize_app(cred)
 
 def account():
-    st.title('Welcome to Knowledge Base')
+    st.title('Tarjeta de presentación en QR')
 
     if 'username' not in st.session_state:
         st.session_state.username = ''
