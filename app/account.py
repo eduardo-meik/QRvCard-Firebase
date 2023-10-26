@@ -44,22 +44,18 @@ def account():
             email = st.text_input('Email Address', key='signup_email')
             password = st.text_input('Password', type='password', key='signup_password')
             confirm_password = st.text_input('Confirm Password', type='password', key='signup_confirm_password')
-            if st.button('Create my account'):
+            if st.button('Crear cuenta'):
                 if password == confirm_password:
                     try:
                         user = auth.create_user(email=email, password=password)
-                        st.success('Account created successfully!')
-                        st.markdown('Please Login using your email and password')
-                        st.balloons()
+                        st.success('Cuenta creada exitosamente')
+                        st.markdown('Ingresar con email y  password') 
                     except Exception as e:
                         st.error(f"Error creating user: {e}")
                 else:
-                    st.error("Passwords don't match!")
+                    st.error("Passwords incorrecto")
 
-    if st.session_state.signout:
-        st.text('Name ' + st.session_state.username)
-        st.text('Email id: ' + st.session_state.useremail)
-        st.button('Sign out', on_click=t)
+
 
 
 
