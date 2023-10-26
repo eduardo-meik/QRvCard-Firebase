@@ -6,7 +6,7 @@ import firebase_admin
 from firebase_admin import credentials
 from app.qrvcard import display_qr
 from app.qrlist import display_list
-from app.account import account  # Importing the account module
+from app.account import account, signout  # Importing the account module
 
 # Initialize Firebase SDK
 def initialize_firebase():
