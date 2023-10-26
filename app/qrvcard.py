@@ -3,7 +3,7 @@ import streamlit as st
 import qrcode
 import io
 from PIL import Image
-from firebase_admin import storage
+from firebase_admin import storage, firestore
 
 def generate_qr(vcard_data):
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -22,8 +22,6 @@ def upload_to_firebase(img_bytes, filename):
     except Exception as e:
         st.error(f"Error uploading to Firebase: {e}")
         return None
-
-
 
 def display_qr():
     st.title('vCard QR Code Generator')
@@ -67,6 +65,12 @@ def display_qr():
 
         filename = f"{full_name}.png"
         file_url = upload_to_firebase(img_bytes, filename)
+
+        # Save vCard data to Firestore with the authenticated user's UID
+        db = firestore.client()
+        vcard_ref = db.collection('vcards').document(st.session_state.username)
+        vCard["QR_URL"] = file_url
+        vcard_ref.set(vCard, merge=True)  # Using merge=True to merge with existing data if any
 
         st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
         st.download_button(
