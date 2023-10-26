@@ -25,8 +25,8 @@ def main():
         st.error(f"An error occurred: {e}")
 
     st.set_page_config(
-        page_title="Ex-stream-ly Cool App",
-        page_icon="🧊"
+        page_title="QR vCard",
+        page_icon="qr-code-scan"
     )
     
     # Check for authentication
