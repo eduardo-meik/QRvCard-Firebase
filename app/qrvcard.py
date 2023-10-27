@@ -25,19 +25,25 @@ def upload_to_firebase(img_bytes, filename):
 
 def display_qr():
     st.title('vCard QR Code Generator')
-    
-    full_name = st.text_input("Nombre Completo", "Juan Soto")
+
+    # Retrieve saved vCard data from Firestore
+    db = firestore.client()
+    vcard_ref = db.collection('vcards').document(st.session_state.username)
+    saved_vCard = vcard_ref.get().to_dict() or {}
+
+    # Populate input fields with saved data or default values
+    full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
     last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
+    organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
+    title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
+    role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
+    phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
+    phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
+    email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
+    url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
+    linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
 
-    organization = st.text_input("Organización", "Ejemplo Ltda.")
-    title = st.text_input("Puesto", "CEO")
-    role = st.text_input("Rol", "Manager")
-    phone_cell = st.text_input("Teléfono (Celular)", "(555) 555-5555")
-    phone_work = st.text_input("Teléfono (Trabajo)", "(555) 555-5555")
-    email = st.text_input("Email (Trabajo)", "john.smith@example.com")
-    url = st.text_input("Website", "https://www.example.com")
-    linkedin = st.text_input("LinkedIn", "https://www.linkedin.com/in/juansoto/")
-
+    # Construct vCard dictionary
     vCard = {
         "BEGIN": "VCARD",
         "VERSION": "3.0",
