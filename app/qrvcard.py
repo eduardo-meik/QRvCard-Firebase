@@ -32,10 +32,16 @@ def display_qr():
     
     image_encoded = None
     if uploaded_image:
-        img_pil = Image.open(uploaded_image).resize((150, 150))  # Resizing for vCard
+        # Open and resize the image to 384x384 jpeg format
+        img_pil = Image.open(uploaded_image).resize((384, 384))
+        
+        # Save the resized image to a BytesIO buffer in jpeg format
         buffered = io.BytesIO()
-        img_pil.save(buffered, format="PNG")
+        img_pil.save(buffered, format="JPEG")
+        
+        # Convert the BytesIO buffer to Base64 and display
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
+        st.text(image_encoded)  # Display the Base64 encoded image
         st.image(img_pil, caption='Uploaded Profile Image', use_column_width=True)
 
     # Retrieve saved vCard data from Firestore
