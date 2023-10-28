@@ -2,6 +2,7 @@
 import streamlit as st
 import qrcode
 import io
+import base64
 from PIL import Image
 from firebase_admin import storage, firestore
 
@@ -14,7 +15,7 @@ def generate_qr(vcard_data):
 
 def upload_to_firebase(img_bytes, filename):
     try:
-        bucket = storage.bucket('pullmai-e0bb0.appspot.com')  # Specifying bucket directly
+        bucket = storage.bucket('pullmai-e0bb0.appspot.com')
         blob = bucket.blob(filename)
         blob.upload_from_string(img_bytes, content_type="image/png")
         blob.make_public()
@@ -26,10 +27,28 @@ def upload_to_firebase(img_bytes, filename):
 def display_qr():
     st.title('vCard QR Code Generator')
 
+    # Upload profile photo
+    uploaded_image = st.file_uploader("Choose a profile image...", type=["jpg", "png", "jpeg"])
+    
+    image_encoded = None
+    if uploaded_image:
+        img_pil = Image.open(uploaded_image).resize((150, 150))  # Resizing for vCard
+        buffered = io.BytesIO()
+        img_pil.save(buffered, format="PNG")
+        image_encoded = base64.b64encode(buffered.getvalue()).decode()
+        st.image(img_pil, caption='Uploaded Profile Image', use_column_width=True)
+
     # Retrieve saved vCard data from Firestore
     db = firestore.client()
     vcard_ref = db.collection('vcards').document(st.session_state.username)
     saved_vCard = vcard_ref.get().to_dict() or {}
+
+    # Decode and show the saved image, if present
+    saved_image_encoded = saved_vCard.get("IMAGE", None)
+    if saved_image_encoded and not uploaded_image:
+        image_bytes = base64.b64decode(saved_image_encoded)
+        img = Image.open(io.BytesIO(image_bytes))
+        st.image(img, caption='Saved Profile Image', use_column_width=True)
 
     # Populate input fields with saved data or default values
     full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
@@ -61,6 +80,9 @@ def display_qr():
         "END": "VCARD",
     }
 
+     if image_encoded:
+        vCard["IMAGE"] = image_encoded
+
     vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
@@ -72,11 +94,8 @@ def display_qr():
         filename = f"{full_name}.png"
         file_url = upload_to_firebase(img_bytes, filename)
 
-        # Save vCard data to Firestore with the authenticated user's UID
-        db = firestore.client()
-        vcard_ref = db.collection('vcards').document(st.session_state.username)
         vCard["QR_URL"] = file_url
-        vcard_ref.set(vCard, merge=True)  # Using merge=True to merge with existing data if any
+        vcard_ref.set(vCard, merge=True)
 
         st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
         st.download_button(
