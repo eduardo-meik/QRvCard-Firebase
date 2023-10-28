@@ -79,10 +79,10 @@ def display_qr():
         "X-SOCIALPROFILE": linkedin,
         "END": "VCARD",
     }
-
-     if image_encoded:
+    
+    if image_encoded:
         vCard["IMAGE"] = image_encoded
-
+    
     vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
