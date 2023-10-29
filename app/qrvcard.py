@@ -1,4 +1,3 @@
-# qrvcard.py
 import streamlit as st
 import qrcode
 import io
@@ -17,7 +16,6 @@ def generate_qr(vcard_data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
-
 def upload_to_firebase(img_bytes, filename):
     try:
         bucket = storage.bucket('pullmai-e0bb0.appspot.com')
@@ -28,6 +26,28 @@ def upload_to_firebase(img_bytes, filename):
     except Exception as e:
         st.error(f"Error uploading to Firebase: {e}")
         return None
+
+def circular_crop(img_pil):
+    # Step 1: Resize while maintaining aspect ratio
+    aspect = img_pil.width / img_pil.height
+    if aspect > 1:
+        # Width is greater than height
+        new_width = int(aspect * 40)
+        img_pil = img_pil.resize((new_width, 40))
+    else:
+        # Height is greater or equal to width
+        new_height = int(40 / aspect)
+        img_pil = img_pil.resize((40, new_height))
+
+    # Step 2: Crop the center of the image to make it square
+    left = (img_pil.width - 40) / 2
+    top = (img_pil.height - 40) / 2
+    right = (img_pil.width + 40) / 2
+    bottom = (img_pil.height + 40) / 2
+
+    img_pil = img_pil.crop((left, top, right, bottom))
+    
+    return img_pil
 
 def display_qr():
     st.title('vCard QR Code Generator')
@@ -40,13 +60,21 @@ def display_qr():
         # Open and resize the image to 384x384 jpeg format
         img_pil = Image.open(uploaded_image).resize((384, 384))
         
+        # Make the image circular and resize it to 40x40 pixels
+        img_pil_circular = circular_crop(img_pil)
+
         # Save the resized image to a BytesIO buffer in jpeg format
         buffered = io.BytesIO()
         img_pil.save(buffered, format="JPEG")
         
         # Convert the BytesIO buffer to Base64 and display
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
-        st.text(image_encoded)  # Display the Base64 encoded image
+        st.markdown(
+            f'<img src="data:image/jpeg;base64,{image_encoded}" style="border-radius: 50%; width: 40px; height: 40px;">',
+            unsafe_allow_html=True
+        )
+
+        # Show the original uploaded image as well
         st.image(img_pil, caption='Uploaded Profile Image', use_column_width=True)
 
     # Retrieve saved vCard data from Firestore
