@@ -87,15 +87,21 @@ def display_qr():
         buffered = io.BytesIO()
         img_pil_circular.save(buffered, format=format)
         
-        # Convert the BytesIO buffer to Base64 and display
+       # Convert the BytesIO buffer to Base64
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
+
+        # Adjust vCard key for image data
+        if format == "JPEG":
+            vCard["PHOTO;TYPE=JPEG;ENCODING=B"] = image_encoded
+        elif format == "PNG":
+            vCard["PHOTO;TYPE=PNG;ENCODING=B"] = image_encoded
+        # Extend with other formats if needed
+
+        # Display the 40x40 circular image in Streamlit
         st.markdown(
             f'<img src="data:image/{format.lower()};base64,{image_encoded}" style="border-radius: 50%; width: 40px; height: 40px;">',
             unsafe_allow_html=True
         )
-
-        # Show the original uploaded image as well
-        st.image(img_pil, caption='Uploaded Profile Image', use_column_width=True)
 
     # Retrieve saved vCard data from Firestore
     db = firestore.client()
