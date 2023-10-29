@@ -57,20 +57,24 @@ def display_qr():
     
     image_encoded = None
     if uploaded_image:
-        # Open and resize the image to 384x384 jpeg format
-        img_pil = Image.open(uploaded_image).resize((384, 384))
+        # Open the image and determine its format
+        img_pil = Image.open(uploaded_image)
+        format = img_pil.format  # Get the format (JPEG, PNG, etc.)
+        
+        # Resize the image to 384x384
+        img_pil = img_pil.resize((384, 384))
         
         # Make the image circular and resize it to 40x40 pixels
         img_pil_circular = circular_crop(img_pil)
 
-        # Save the resized image to a BytesIO buffer in jpeg format
+        # Save the resized image to a BytesIO buffer in the determined format
         buffered = io.BytesIO()
-        img_pil.save(buffered, format="JPEG")
+        img_pil.save(buffered, format=format)
         
         # Convert the BytesIO buffer to Base64 and display
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
         st.markdown(
-            f'<img src="data:image/jpeg;base64,{image_encoded}" style="border-radius: 50%; width: 40px; height: 40px;">',
+            f'<img src="data:image/{format.lower()};base64,{image_encoded}" style="border-radius: 50%; width: 40px; height: 40px;">',
             unsafe_allow_html=True
         )
 
