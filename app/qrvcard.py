@@ -33,126 +33,27 @@ def upload_to_firebase(img_bytes, filename):
         st.error(f"Error uploading to Firebase: {e}")
         return None
 
-def square_crop(img_pil):
-    """Crop the PIL image to a centered square."""
-    width, height = img_pil.size
-    new_dim = min(width, height)
-    
-    left = (width - new_dim)/2
-    top = (height - new_dim)/2
-    right = (width + new_dim)/2
-    bottom = (height + new_dim)/2
-    
-    return img_pil.crop((left, top, right, bottom))
-
-
-def circular_crop(img_pil):
-    # Step 1: Resize while maintaining aspect ratio
-    aspect = img_pil.width / img_pil.height
-    if aspect > 1:
-        # Width is greater than height
-        new_width = int(aspect * 40)
-        img_pil = img_pil.resize((new_width, 40))
-    else:
-        # Height is greater or equal to width
-        new_height = int(40 / aspect)
-        img_pil = img_pil.resize((40, new_height))
-
-    # Step 2: Crop the center of the image to make it square
-    left = (img_pil.width - 40) / 2
-    top = (img_pil.height - 40) / 2
-    right = (img_pil.width + 40) / 2
-    bottom = (img_pil.height + 40) / 2
-
-    img_pil = img_pil.crop((left, top, right, bottom))
-    
-    return img_pil
-
 def display_qr():
     st.title('vCard QR Code Generator')
-
-    # Upload profile photo
-    uploaded_image = st.file_uploader("Choose a profile image...", type=["jpg", "png", "jpeg"])
-
-    image_encoded = None  # Initialize image_encoded here
-
-    if uploaded_image:
-        format = uploaded_image.type.split('/')[-1].upper()
-
-        # Open the uploaded image with PIL
-        img_pil = Image.open(uploaded_image)
-
-        # Ensure the image is square by cropping
-        width, height = img_pil.size
-        if width > height:
-            left = (width - height) / 2
-            right = (width + height) / 2
-            top = 0
-            bottom = height
-        else:
-            top = (height - width) / 2
-            bottom = (height + width) / 2
-            left = 0
-            right = width
-        img_pil = img_pil.crop((left, top, right, bottom))
-
-        # Resize image to 40x40
-        img_pil = img_pil.resize((40, 40))
-
-        # Save the resized square image to a BytesIO buffer in the determined format
-        buffered = io.BytesIO()
-        img_pil.save(buffered, format=format)
-
-        # Convert the BytesIO buffer to Base64
-        image_encoded = base64.b64encode(buffered.getvalue()).decode()
-
-        # Adjust vCard key for image data
-        if format == "JPEG":
-            vCard["PHOTO;TYPE=JPEG;ENCODING=B"] = image_encoded
-        elif format == "PNG":
-            vCard["PHOTO;TYPE=PNG;ENCODING=B"] = image_encoded
-        # Extend with other formats if needed
-
-        # Display the 40x40 circular image in Streamlit
-        st.markdown(
-            f'<img src="data:image/{format.lower()};base64,{image_encoded}" style="border-radius: 50%; width: 40px; height: 40px;">',
-            unsafe_allow_html=True
-        )
 
     # Retrieve saved vCard data from Firestore
     db = firestore.client()
     vcard_ref = db.collection('vcards').document(st.session_state.username)
     saved_vCard = vcard_ref.get().to_dict() or {}
 
-    # Decode and show the saved image, if present
-    saved_image_encoded = saved_vCard.get("IMAGE", None)
-    if saved_image_encoded and not uploaded_image:
-        image_bytes = base64.b64decode(saved_image_encoded)
-        img = Image.open(io.BytesIO(image_bytes))
-        st.image(img, caption='Saved Profile Image', use_column_width=True)
+    # Populate input fields with saved data or default values
+    full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
+    last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
+    organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
+    title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
+    role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
+    phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
+    phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
+    email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
+    url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
+    linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
 
-  # Populateimport streamlit as st
-import base64
-import os
-
-def b64_image(filename):
-    with open(filename, 'rb') as f:
-        b64 = base64.b64encode(f.read())
-        return b64.decode('utf-8')
-
-# Populate input fields with saved data or default values
-full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
-last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
-organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
-title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
-role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
-phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
-phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
-email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
-url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
-linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
-
-# Handle image upload
+   # Handle image upload
 uploaded_image = st.file_uploader("Upload your image", type=['png', 'jpg', 'jpeg'])
 
 if uploaded_image:
@@ -191,23 +92,23 @@ vCard = {
 
 vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
-if st.button('Generate QR Code'):
-    img_pil = generate_qr(vcard_data)
-    buffered = io.BytesIO()
-    img_pil.save(buffered, format="PNG")
-    img_bytes = buffered.getvalue()
+ if st.button('Generate QR Code'):
+        img_pil = generate_qr(vcard_data)
+        buffered = io.BytesIO()
+        img_pil.save(buffered, format="PNG")
+        img_bytes = buffered.getvalue()
 
-    filename = f"{full_name}.png"
-    file_url = upload_to_firebase(img_bytes, filename)
+        filename = f"{full_name}.png"
+        file_url = upload_to_firebase(img_bytes, filename)
 
-    vCard["QR_URL"] = file_url
-    vcard_ref.set(vCard, merge=True)
+        vCard["QR_URL"] = file_url
+        vcard_ref.set(vCard, merge=True)
 
-    st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
-    st.download_button(
-        label="Download QR Code",
-        data=img_bytes,
-        file_name=filename,
-        mime="image/png"
-    )
-    st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
+        st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
+        st.download_button(
+            label="Download QR Code",
+            data=img_bytes,
+            file_name=filename,
+            mime="image/png"
+        )
+        st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
