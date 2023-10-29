@@ -125,7 +125,7 @@ def display_qr():
         img = Image.open(io.BytesIO(image_bytes))
         st.image(img, caption='Saved Profile Image', use_column_width=True)
 
-    # Populate input fields with saved data or default values
+  # Populate input fields with saved data or default values
     full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
     last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
     organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
@@ -155,6 +155,22 @@ def display_qr():
         "END": "VCARD",
     }
 
+    # Handle image upload
+    uploaded_image = st.file_uploader("Upload your image", type=['png', 'jpg', 'jpeg'])
+
+    if uploaded_image:
+        img = Image.open(uploaded_image)
+        buffered = io.BytesIO()
+        img.save(buffered, format=img.format)
+
+        # Convert image to base64 and add to the vCard
+        image_encoded = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        if img.format == "JPEG":
+            vCard["PHOTO;TYPE=JPEG;ENCODING=B"] = image_encoded
+        elif img.format == "PNG":
+            vCard["PHOTO;TYPE=PNG;ENCODING=B"] = image_encoded
+
+    # Construct vCard data string
     vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
