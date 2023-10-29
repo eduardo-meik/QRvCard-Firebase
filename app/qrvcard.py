@@ -7,11 +7,16 @@ from PIL import Image
 from firebase_admin import storage, firestore
 
 def generate_qr(vcard_data):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr = qrcode.QRCode(
+        version=None,  # Let the library decide the version
+        box_size=10,
+        border=5
+    )
     qr.add_data(vcard_data)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     return img
+
 
 def upload_to_firebase(img_bytes, filename):
     try:
