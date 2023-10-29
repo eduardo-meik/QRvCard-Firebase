@@ -70,41 +70,6 @@ def display_qr():
 
     image_encoded = None  # Initialize image_encoded here
 
-    # Retrieve saved vCard data from Firestore
-    db = firestore.client()
-    vcard_ref = db.collection('vcards').document(st.session_state.username)
-    saved_vCard = vcard_ref.get().to_dict() or {}
-
-    # Populate input fields with saved data or default values
-    full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
-    last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
-    organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
-    title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
-    role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
-    phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
-    phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
-    email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
-    url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
-    linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
-
-    # Construct vCard dictionary
-    vCard = {
-        "BEGIN": "VCARD",
-        "VERSION": "3.0",
-        "KIND": "INDIVIDUAL",
-        "FN": full_name,
-        "N": f"{last_name};{first_name};;;",
-        "EMAIL;TYPE=WORK": email,
-        "TITLE": title,
-        "ROLE": role,
-        "TEL;TYPE=CELL": phone_cell,
-        "TEL;TYPE=WORK": phone_work,
-        "URL": url,
-        "ORG": organization,
-        "X-SOCIALPROFILE": linkedin,
-        "END": "VCARD",
-    }
-
     if uploaded_image:
         format = uploaded_image.type.split('/')[-1].upper()
 
@@ -148,6 +113,48 @@ def display_qr():
             unsafe_allow_html=True
         )
 
+    # Retrieve saved vCard data from Firestore
+    db = firestore.client()
+    vcard_ref = db.collection('vcards').document(st.session_state.username)
+    saved_vCard = vcard_ref.get().to_dict() or {}
+
+    # Decode and show the saved image, if present
+    saved_image_encoded = saved_vCard.get("IMAGE", None)
+    if saved_image_encoded and not uploaded_image:
+        image_bytes = base64.b64decode(saved_image_encoded)
+        img = Image.open(io.BytesIO(image_bytes))
+        st.image(img, caption='Saved Profile Image', use_column_width=True)
+
+    # Populate input fields with saved data or default values
+    full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
+    last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
+    organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
+    title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
+    role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
+    phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
+    phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
+    email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
+    url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
+    linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
+
+    # Construct vCard dictionary
+    vCard = {
+        "BEGIN": "VCARD",
+        "VERSION": "3.0",
+        "KIND": "INDIVIDUAL",
+        "FN": full_name,
+        "N": f"{last_name};{first_name};;;",
+        "EMAIL;TYPE=WORK": email,
+        "TITLE": title,
+        "ROLE": role,
+        "TEL;TYPE=CELL": phone_cell,
+        "TEL;TYPE=WORK": phone_work,
+        "URL": url,
+        "ORG": organization,
+        "X-SOCIALPROFILE": linkedin,
+        "END": "VCARD",
+    }
+
     vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
@@ -160,4 +167,13 @@ def display_qr():
         file_url = upload_to_firebase(img_bytes, filename)
 
         vCard["QR_URL"] = file_url
-        vcard_ref.set(vCard,
+        vcard_ref.set(vCard, merge=True)
+
+        st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
+        st.download_button(
+            label="Download QR Code",
+            data=img_bytes,
+            file_name=filename,
+            mime="image/png"
+        )
+        st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
