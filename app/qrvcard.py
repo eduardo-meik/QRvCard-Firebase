@@ -67,27 +67,37 @@ def display_qr():
 
     # Upload profile photo
     uploaded_image = st.file_uploader("Choose a profile image...", type=["jpg", "png", "jpeg"])
-    
-    image_encoded = None
+
+    image_encoded = None  # Initialize image_encoded here
+
     if uploaded_image:
-        # Open the image and determine its format
+        format = uploaded_image.type.split('/')[-1].upper()
+
+        # Open the uploaded image with PIL
         img_pil = Image.open(uploaded_image)
-        format = img_pil.format  # Get the format (JPEG, PNG, etc.)
 
-        # Crop image to a centered square
-        img_pil = square_crop(img_pil)
-        
-        # Resize the image to 384x384
-        img_pil = img_pil.resize((384, 384))
-        
-        # Make the image circular and resize it to 40x40 pixels
-        img_pil_circular = circular_crop(img_pil).resize((40, 40))
+        # Ensure the image is square by cropping
+        width, height = img_pil.size
+        if width > height:
+            left = (width - height) / 2
+            right = (width + height) / 2
+            top = 0
+            bottom = height
+        else:
+            top = (height - width) / 2
+            bottom = (height + width) / 2
+            left = 0
+            right = width
+        img_pil = img_pil.crop((left, top, right, bottom))
 
-        # Save the resized image to a BytesIO buffer in the determined format
+        # Resize image to 40x40
+        img_pil = img_pil.resize((40, 40))
+
+        # Save the resized square image to a BytesIO buffer in the determined format
         buffered = io.BytesIO()
-        img_pil_circular.save(buffered, format=format)
-        
-       # Convert the BytesIO buffer to Base64
+        img_pil.save(buffered, format=format)
+
+        # Convert the BytesIO buffer to Base64
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
 
         # Adjust vCard key for image data
@@ -144,10 +154,7 @@ def display_qr():
         "X-SOCIALPROFILE": linkedin,
         "END": "VCARD",
     }
-    
-    if image_encoded:
-        vCard["IMAGE"] = image_encoded
-    
+
     vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
