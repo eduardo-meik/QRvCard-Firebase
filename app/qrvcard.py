@@ -27,6 +27,19 @@ def upload_to_firebase(img_bytes, filename):
         st.error(f"Error uploading to Firebase: {e}")
         return None
 
+def square_crop(img_pil):
+    """Crop the PIL image to a centered square."""
+    width, height = img_pil.size
+    new_dim = min(width, height)
+    
+    left = (width - new_dim)/2
+    top = (height - new_dim)/2
+    right = (width + new_dim)/2
+    bottom = (height + new_dim)/2
+    
+    return img_pil.crop((left, top, right, bottom))
+
+
 def circular_crop(img_pil):
     # Step 1: Resize while maintaining aspect ratio
     aspect = img_pil.width / img_pil.height
@@ -60,16 +73,19 @@ def display_qr():
         # Open the image and determine its format
         img_pil = Image.open(uploaded_image)
         format = img_pil.format  # Get the format (JPEG, PNG, etc.)
+
+        # Crop image to a centered square
+        img_pil = square_crop(img_pil)
         
         # Resize the image to 384x384
         img_pil = img_pil.resize((384, 384))
         
         # Make the image circular and resize it to 40x40 pixels
-        img_pil_circular = circular_crop(img_pil)
+        img_pil_circular = circular_crop(img_pil).resize((40, 40))
 
         # Save the resized image to a BytesIO buffer in the determined format
         buffered = io.BytesIO()
-        img_pil.save(buffered, format=format)
+        img_pil_circular.save(buffered, format=format)
         
         # Convert the BytesIO buffer to Base64 and display
         image_encoded = base64.b64encode(buffered.getvalue()).decode()
