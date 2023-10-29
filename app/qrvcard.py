@@ -160,7 +160,4 @@ def display_qr():
         file_url = upload_to_firebase(img_bytes, filename)
 
         vCard["QR_URL"] = file_url
-        vcard_ref.set(vCard, merge=True)
-
-        st.image(img_bytes, caption='Generated QR Code', use
-
+        vcard_ref.set(vCard,
