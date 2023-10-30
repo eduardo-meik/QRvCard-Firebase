@@ -12,15 +12,19 @@ def b64_image(filename):
         return b64.decode('utf-8')
 
 def generate_qr(vcard_data):
-    qr = qrcode.QRCode(
-        version=None,  # Let the library decide the version
-        box_size=10,
-        border=5
-    )
-    qr.add_data(vcard_data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    return img
+    try:
+        qr = qrcode.QRCode(
+            version=None,  # Let the library decide the version
+            box_size=10,
+            border=5
+        )
+        qr.add_data(vcard_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        return img
+    except ValueError:
+        st.error("Failed to generate QR code. Please try reducing the amount of data.")
+        return None
 
 def upload_to_firebase(img_bytes, filename):
     try:
