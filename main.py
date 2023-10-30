@@ -67,7 +67,6 @@ def main():
         st.title("Inicio")
         display_list()
     elif selected == "QR vCard":
-        st.title("QR vCard")
         display_qr()
     elif selected == "Salir":
         signout()
