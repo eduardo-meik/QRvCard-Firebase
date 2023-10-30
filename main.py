@@ -8,6 +8,12 @@ from app.qrvcard import display_qr
 from app.qrlist import display_list
 from app.account import account, signout  # Importing the account module
 
+# Set the page config at the top level
+st.set_page_config(
+    page_title="QR vCard",
+    page_icon="🧊"
+)
+
 # Initialize Firebase SDK
 def initialize_firebase():
     key_dict = json.loads(st.secrets["textkey"])
@@ -24,11 +30,6 @@ def main():
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
-    st.set_page_config(
-        page_title="QR vCard",
-        page_icon="🧊"
-    )
-    
     # Check for authentication
     if not st.session_state.get("signedout", False):  # User not logged in
         account()  # This calls the account function which handles authentication
