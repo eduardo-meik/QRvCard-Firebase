@@ -7,6 +7,7 @@ from firebase_admin import credentials
 from app.qrvcard import display_qr
 from app.qrlist import display_list
 from app.account import account, signout  # Importing the account module
+from app.footer import footer
 
 # Set the page config at the top level
 st.set_page_config(
@@ -22,15 +23,8 @@ def initialize_firebase():
     if not firebase_admin._apps:
         firebase_admin.initialize_app(creds, {'storageBucket': 'pullmai-e0bb0.appspot.com'})
 
-
-# Define main app function
-def main():
-    try:
-        initialize_firebase()
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-
-    # Hide the footer using custom CSS
+def custom_footer():
+    # Hide the default Streamlit footer and add 'goodbye' text
     st.markdown("""
         <style>
             footer {
@@ -47,12 +41,20 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
+# Define main app function
+def main():
+    try:
+        initialize_firebase()
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+
+    custom_footer()
+
     # Check for authentication
     if not st.session_state.get("signedout", False):  # User not logged in
         account()  # This calls the account function which handles authentication
         return  # Ensures that the rest of the application doesn't run until the user is authenticated
 
-    
     # Navigation bar Menu
     selected = option_menu(
         menu_title=None,  # menu title
@@ -71,6 +73,9 @@ def main():
         display_qr()
     elif selected == "Salir":
         signout()
+    
+    footer()  # Apply the custom footer from footer.py
    
 if __name__ == "__main__":
     main()
+
