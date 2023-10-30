@@ -67,7 +67,7 @@ def display_qr():
     if uploaded_image:
         # ... [rest of the uploaded_image block]
 
-    vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
+        vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     img_bytes = None  # Initialize img_bytes to ensure it's always defined
 
