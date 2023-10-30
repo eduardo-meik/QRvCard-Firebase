@@ -100,7 +100,7 @@ def upload_to_firebase(img_bytes, filename):
         # Optional: Remove the temporary file after processing
         os.remove(tmp_filename)
 
-        vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
+            vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
 
     if st.button('Generate QR Code'):
         img_pil = generate_qr(vcard_data)
