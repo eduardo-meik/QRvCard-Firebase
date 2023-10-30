@@ -43,7 +43,7 @@ def upload_to_firebase(img_bytes, filename):
         return None
 
 
-def display_qr():
+ def display_qr():
     st.title('vCard QR Code Generator')
 
     # Retrieve saved vCard data from Firestore
@@ -53,23 +53,54 @@ def display_qr():
 
     # Populate input fields with saved data or default values
     full_name = st.text_input("Nombre Completo", saved_vCard.get("FN", "Juan Soto"))
-    # ... [rest of the input fields]
+    last_name, first_name = full_name.split(' ', 1) if ' ' in full_name else (full_name, '')
+    organization = st.text_input("Organización", saved_vCard.get("ORG", "Ejemplo Ltda."))
+    title = st.text_input("Puesto", saved_vCard.get("TITLE", "CEO"))
+    role = st.text_input("Rol", saved_vCard.get("ROLE", "Manager"))
+    phone_cell = st.text_input("Teléfono (Celular)", saved_vCard.get("TEL;TYPE=CELL", "(555) 555-5555"))
+    phone_work = st.text_input("Teléfono (Trabajo)", saved_vCard.get("TEL;TYPE=WORK", "(555) 555-5555"))
+    email = st.text_input("Email (Trabajo)", saved_vCard.get("EMAIL;TYPE=WORK", "john.smith@example.com"))
+    url = st.text_input("Website", saved_vCard.get("URL", "https://www.example.com"))
+    linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
 
-    # Handle image upload
+   # Handle image upload
     vCard = {
         "BEGIN": "VCARD",
-        # ... [rest of the vCard dictionary]
+        "VERSION": "3.0",
+        "KIND": "INDIVIDUAL",
+        "FN": full_name,
+        "N": f"{last_name};{first_name};;;",
+        "EMAIL;TYPE=WORK": email,
+        "TITLE": title,
+        "ROLE": role,
+        "TEL;TYPE=CELL": phone_cell,
+        "TEL;TYPE=WORK": phone_work,
+        "URL": url,
+        "ORG": organization,
+        "X-SOCIALPROFILE": linkedin,
         "END": "VCARD",
     }
 
     uploaded_image = st.file_uploader("Upload your image", type=['png', 'jpg', 'jpeg'])
 
     if uploaded_image:
-        # ... [rest of the uploaded_image block]
+        # Save uploaded image to a temporary file
+        tmp_filename = "tmp_uploaded_image." + uploaded_image.type.split("/")[-1]
+        with open(tmp_filename, "wb") as f:
+            f.write(uploaded_image.getvalue())
+
+        # Upload user's photo to Firebase and retrieve its URL
+        user_photo_url = upload_to_firebase(uploaded_image.getvalue(), tmp_filename)
+
+        if user_photo_url:
+            # Add to vCard
+            photo_enc_type = "image/jpeg" if uploaded_image.type == "image/jpeg" else "image/png"
+            vCard[f"PHOTO;ENCODING=b;TYPE={photo_enc_type}"] = b64_image(tmp_filename)
+
+        # Optional: Remove the temporary file after processing
+        os.remove(tmp_filename)
 
         vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
-
-    img_bytes = None  # Initialize img_bytes to ensure it's always defined
 
     if st.button('Generate QR Code'):
         img_pil = generate_qr(vcard_data)
@@ -80,16 +111,22 @@ def display_qr():
         img_pil.save(buffered, format="PNG")
         img_bytes = buffered.getvalue()
 
-        # ... [rest of the QR code generation block]
+        # Upload the QR code image to Firebase
+        filename = f"{full_name}_QR.png"
+        qr_file_url = upload_to_firebase(img_bytes, filename)
+        if qr_file_url:
+            vCard["QR_URL"] = qr_file_url
 
-    if img_bytes:
-        st.download_button(
-            label="Download QR Code",
-            data=img_bytes,
-            file_name=filename,
-            mime="image/png"
-        )
-        st.write(f"Uploaded to Firebase Storage: [Link]({qr_file_url})")
+        st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
+   if img_bytes:
+    st.download_button(
+        label="Download QR Code",
+        data=img_bytes,
+        file_name=filename,
+        mime="image/png"
+    )
+    st.write(f"Uploaded to Firebase Storage: [Link]({qr_file_url})")
+
 
 # Call the function
 display_qr()
