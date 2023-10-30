@@ -5,6 +5,7 @@ import base64
 from PIL import Image
 from firebase_admin import storage, firestore
 import os
+from datetime import timedelta  # Import timedelta
 
 def b64_image(filename):
     with open(filename, 'rb') as f:
@@ -117,13 +118,13 @@ def display_qr():
             vCard["QR_URL"] = qr_file_url
 
         st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
-        st.download_button(
-            label="Download QR Code",
-            data=img_bytes,
-            file_name=filename,
-            mime="image/png"
-        )
-        st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
+    st.download_button(
+        label="Download QR Code",
+        data=img_bytes,
+        file_name=filename,
+        mime="image/png"
+    )
+    st.write(f"Uploaded to Firebase Storage: [Link]({qr_file_url})")  # Use qr_file_url instead of file_url
 
 # Call the function
 display_qr()
