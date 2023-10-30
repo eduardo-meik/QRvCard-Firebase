@@ -30,6 +30,23 @@ def main():
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
+    # Hide the footer using custom CSS
+    st.markdown("""
+        <style>
+            footer {
+                visibility: hidden;
+            }
+            footer:after {
+                content:'goodbye'; 
+                visibility: visible;
+                display: block;
+                position: relative;
+                padding: 5px;
+                top: 2px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Check for authentication
     if not st.session_state.get("signedout", False):  # User not logged in
         account()  # This calls the account function which handles authentication
