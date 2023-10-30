@@ -118,13 +118,15 @@ def display_qr():
             vCard["QR_URL"] = qr_file_url
 
         st.image(img_bytes, caption='Generated QR Code', use_column_width=True)
+   if img_bytes:
     st.download_button(
         label="Download QR Code",
         data=img_bytes,
         file_name=filename,
         mime="image/png"
     )
-    st.write(f"Uploaded to Firebase Storage: [Link]({qr_file_url})")  # Use qr_file_url instead of file_url
+    st.write(f"Uploaded to Firebase Storage: [Link]({qr_file_url})")
+
 
 # Call the function
 display_qr()
