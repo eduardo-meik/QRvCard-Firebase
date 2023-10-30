@@ -54,45 +54,43 @@ def display_qr():
     linkedin = st.text_input("LinkedIn", saved_vCard.get("X-SOCIALPROFILE", "https://www.linkedin.com/in/juansoto/"))
 
    # Handle image upload
-uploaded_image = st.file_uploader("Upload your image", type=['png', 'jpg', 'jpeg'])
+    uploaded_image = st.file_uploader("Upload your image", type=['png', 'jpg', 'jpeg'])
+    vCard = {
+        "BEGIN": "VCARD",
+        "VERSION": "3.0",
+        "KIND": "INDIVIDUAL",
+        "FN": full_name,
+        "N": f"{last_name};{first_name};;;",
+        "EMAIL;TYPE=WORK": email,
+        "TITLE": title,
+        "ROLE": role,
+        "TEL;TYPE=CELL": phone_cell,
+        "TEL;TYPE=WORK": phone_work,
+        "URL": url,
+        "ORG": organization,
+        "X-SOCIALPROFILE": linkedin,
+        "END": "VCARD",
+    }
 
-if uploaded_image:
-    # Save uploaded image to a temporary file
-    tmp_filename = "tmp_uploaded_image." + uploaded_image.type.split("/")[-1]
-    with open(tmp_filename, "wb") as f:
-        f.write(uploaded_image.getvalue())
-    
-    # Encode image to base64 and add to the vCard
-    image_encoded = b64_image(tmp_filename)
-    if uploaded_image.type == "image/jpeg":
-        vCard["PHOTO;ENCODING=B;TYPE=IMAGE/JPEG"] = image_encoded
-    elif uploaded_image.type == "image/png":
-        vCard["PHOTO;ENCODING=B;TYPE=IMAGE/PNG"] = image_encoded
-    
-    # Optional: Remove the temporary file after processing
-    os.remove(tmp_filename)
+    if uploaded_image:
+        # Save uploaded image to a temporary file
+        tmp_filename = "tmp_uploaded_image." + uploaded_image.type.split("/")[-1]
+        with open(tmp_filename, "wb") as f:
+            f.write(uploaded_image.getvalue())
 
-# Construct vCard dictionary
-vCard = {
-    "BEGIN": "VCARD",
-    "VERSION": "3.0",
-    "KIND": "INDIVIDUAL",
-    "FN": full_name,
-    "N": f"{last_name};{first_name};;;",
-    "EMAIL;TYPE=WORK": email,
-    "TITLE": title,
-    "ROLE": role,
-    "TEL;TYPE=CELL": phone_cell,
-    "TEL;TYPE=WORK": phone_work,
-    "URL": url,
-    "ORG": organization,
-    "X-SOCIALPROFILE": linkedin,
-    "END": "VCARD",
-}
+        # Encode image to base64 and add to the vCard
+        image_encoded = b64_image(tmp_filename)
+        if uploaded_image.type == "image/jpeg":
+            vCard["PHOTO;ENCODING=B;TYPE=IMAGE/JPEG"] = image_encoded
+        elif uploaded_image.type == "image/png":
+            vCard["PHOTO;ENCODING=B;TYPE=IMAGE/PNG"] = image_encoded
 
-vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
+        # Optional: Remove the temporary file after processing
+        os.remove(tmp_filename)
 
- if st.button('Generate QR Code'):
+    vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
+
+    if st.button('Generate QR Code'):
         img_pil = generate_qr(vcard_data)
         buffered = io.BytesIO()
         img_pil.save(buffered, format="PNG")
@@ -112,3 +110,6 @@ vcard_data = "\n".join(f"{key}:{value}" for key, value in vCard.items())
             mime="image/png"
         )
         st.write(f"Uploaded to Firebase Storage: [Link]({file_url})")
+
+# Call the function
+display_qr()
