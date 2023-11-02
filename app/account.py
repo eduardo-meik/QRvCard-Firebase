@@ -17,17 +17,19 @@ def account():
     if 'useremail' not in st.session_state:
         st.session_state.useremail = ''
 
-    def f():
-        try:
-            user = auth.get_user_by_email(email)
-            st.session_state.username = user.uid
-            st.session_state.useremail = user.email
-            st.session_state.signedout = True
-            st.session_state.signout = True
-            st.session_state.login_successful = True  # Set a new session state variable
-        except:
-            st.warning('Login Failed')
-            st.session_state.login_successful = False
+def login_user():
+    email = st.session_state['login_email']
+    password = st.session_state['login_password']
+    try:
+        user = auth.get_user_by_email(email)
+        st.session_state.username = user.uid
+        st.session_state.useremail = user.email
+        st.session_state.signedout = True
+        st.session_state.signout = True
+        st.session_state.login_successful = True
+    except:
+        st.warning('Login Failed')
+        st.session_state.login_successful = False
 
 
     def t():
@@ -44,10 +46,10 @@ def account():
         login_tab, signup_tab = st.tabs(['Login', 'Sign up'])
 
         with login_tab:
-            email = st.text_input('Email Address', key='login_email')
-            password = st.text_input('Password', type='password', key='login_password')
-            if st.button('Login'):
-                f()
+        email = st.text_input('Email Address', key='login_email')
+        password = st.text_input('Password', type='password', key='login_password')
+        if st.button('Login', on_click=login_user):
+            pass  # The callback function 'login_user' is now used
 
         with signup_tab:
             email = st.text_input('Email Address', key='signup_email')
